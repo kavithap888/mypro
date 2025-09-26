@@ -3,180 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anti‑Phishing Helper</title>
+  <title>Anti‑Phishing Warning on Arrival</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f2f5;
-      color: #333;
+      margin: 2rem;
     }
-    header {
-      background: #1976d2;
-      color: white;
-      padding: 1.5rem;
-      text-align: center;
-      font-size: 1.25rem;
+    .link-warning {
+      color: #b71c1c;
+      border-bottom: 1px dotted #b71c1c;
+      cursor: help;
     }
-    .container {
-      max-width: 600px;
-      margin: 2.5rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    .link-disabled {
+      pointer-events: none;
+      opacity: 0.6;
     }
-    .warning {
-      color: #d32f2f;
-      font-weight: bold;
-      margin-bottom: 1.25rem;
-      text-align: center;
-    }
-    .input-group {
-      margin-bottom: 1.75rem;
-    }
-    .input-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-    .input-group input {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border: 1px solid #bbb;
+    .tooltip {
+      position: absolute;
+      background: #fef3f3;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      padding: 8px 12px;
       border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-    }
-    .input-group input:focus {
-      outline: none;
-      border-color: #1976d2;
-    }
-    .btn {
-      background: #1976d2;
-      color: white;
-      border: none;
-      padding: 0.85rem 1.7rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.2s;
-      display: block;
-      margin: 0 auto;
-    }
-    .btn:hover {
-      background: #115293;
-    }
-    .result {
-      margin-top: 1.75rem;
-      padding: 1.2rem;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    .result.safe {
-      background: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid #a5d6a7;
-    }
-    .result.danger {
-      background: #ffebee;
-      color: #c62828;
-      border: 1px solid #ef9a9a;
-    }
-    .hidden {
-      display: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 0.9rem;
+      white-space: nowrap;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
-  <header>
-    🛡️ Anti‑Phishing Link Checker
-  </header>
-
-  <div class="container">
-    <div class="warning">
-      ⚠️ Always double-check before clicking links!
-    </div>
-
-    <div class="input-group">
-      <label for="linkInput">Enter a link you received:</label>
-      <input
-        type="text"
-        id="linkInput"
-        placeholder="https://example.com/..."
-        aria-label="URL input"
-      />
-    </div>
-
-    <button class="btn" id="checkBtn">Check Link</button>
-
-    <div id="resultBox" class="result hidden"></div>
-  </div>
+  <h2>Example Content with links</h2>
+  <p>
+    Click here: <a href="https://bit.ly/malicious">Suspicious Short Link</a>
+  </p>
+  <p>
+    Safe example: <a href="https://www.example.com">Example.com</a>
+  </p>
 
   <script>
-    (function() {
-      const checkBtn = document.getElementById('checkBtn');
-      const linkInput = document.getElementById('linkInput');
-      const resultBox = document.getElementById('resultBox');
-
-      function showResult(safe, message) {
-        resultBox.textContent = message;
-        resultBox.classList.remove('hidden', 'safe', 'danger');
-        if (safe) {
-          resultBox.classList.add('safe');
-        } else {
-          resultBox.classList.add('danger');
-        }
-      }
-
-      function validateURL(url) {
-        try {
-          new URL(url);
-          return true;
-        } catch (e) {
-          return false;
-        }
-      }
-
-      function checkLink() {
-        const link = linkInput.value.trim();
-        if (!link) {
-          showResult(false, "Please enter a URL to check.");
-          return;
-        }
-        // If user omitted protocol (http/https), try to add default
-        let fullLink = link;
-        if (!/^(http|https):\/\//i.test(link)) {
-          fullLink = "https://" + link;
-        }
-        if (!validateURL(fullLink)) {
-          showResult(false, "That doesn’t look like a valid URL. Please check and try again.");
-          return;
-        }
-
-        // Basic heuristics — you can enhance with an API or more rules
-        const suspiciousPatterns = [
-          "bit.ly", "tinyurl", "free", "login", "verify", "update", "signin", "account", "secure"
-        ];
-        const lower = fullLink.toLowerCase();
-
+    document.addEventListener('DOMContentLoaded', () => {
+      const suspiciousPatterns = [
+        "bit.ly", "tinyurl", "free", "login", "verify", "update", "signin", "account", "secure"
+      ];
+      
+      function isSuspiciousLink(href) {
+        const lower = href.toLowerCase();
         for (const pat of suspiciousPatterns) {
           if (lower.includes(pat)) {
-            showResult(false, `⚠️ This link looks suspicious (contains “${pat}”). Be cautious!`);
-            return;
+            return pat;
           }
         }
-
-        showResult(true, "✅ This link appears comparatively safer (no obvious risky patterns detected).");
+        return null;
       }
 
-      checkBtn.addEventListener('click', checkLink);
-      linkInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          checkLink();
+      function showTooltip(targetElem, message) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        tooltip.textContent = message;
+        document.body.appendChild(tooltip);
+
+        function position() {
+          const rect = targetElem.getBoundingClientRect();
+          const top = rect.bottom + window.scrollY + 4;
+          const left = rect.left + window.scrollX;
+          tooltip.style.top = top + 'px';
+          tooltip.style.left = left + 'px';
+        }
+        position();
+        // reposition on scroll or resize
+        window.addEventListener('scroll', position);
+        window.addEventListener('resize', position);
+
+        // remove on mouseout
+        targetElem.addEventListener('mouseout', () => {
+          tooltip.remove();
+        }, { once: true });
+      }
+
+      const links = document.querySelectorAll('a[href]');
+      links.forEach(a => {
+        const href = a.getAttribute('href');
+        const pat = isSuspiciousLink(href);
+        if (pat) {
+          // mark the link visually
+          a.classList.add('link-warning', 'link-disabled');
+          // you can still allow click but show a confirm dialog,
+          // or fully disable as above (pointer-events none)
+          
+          // add hover tooltip
+          a.addEventListener('mouseover', () => {
+            showTooltip(a, `⚠️ Warning: this link contains “${pat}” — may be unsafe`);
+          });
+          
+          // optionally, intercept click to show a confirmation
+          a.addEventListener('click', (event) => {
+            event.preventDefault();
+            const userOk = confirm(`This link appears suspicious (contains “${pat}”). Are you sure you want to proceed?`);
+            if (userOk) {
+              window.location.href = href;
+            }
+          });
         }
       });
-    })();
+    });
   </script>
 </body>
 </html>
