@@ -7,136 +7,176 @@
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
-      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
     }
     header {
-      background: #333;
+      background: #1976d2;
       color: white;
-      padding: 1rem;
+      padding: 1.5rem;
       text-align: center;
+      font-size: 1.25rem;
     }
     .container {
       max-width: 600px;
-      margin: 2rem auto;
+      margin: 2.5rem auto;
       background: white;
       padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
     }
     .warning {
-      color: #b71c1c;
+      color: #d32f2f;
       font-weight: bold;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
     }
     .input-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
     }
     .input-group label {
       display: block;
       margin-bottom: 0.5rem;
+      font-weight: 500;
     }
     .input-group input {
       width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #bbb;
       border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: #1976d2;
     }
     .btn {
       background: #1976d2;
       color: white;
       border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 0.85rem 1.7rem;
       border-radius: 4px;
       cursor: pointer;
       font-size: 1rem;
+      transition: background 0.2s;
+      display: block;
+      margin: 0 auto;
     }
     .btn:hover {
       background: #115293;
     }
     .result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      border-radius: 4px;
+      margin-top: 1.75rem;
+      padding: 1.2rem;
+      border-radius: 6px;
+      font-size: 1rem;
     }
     .result.safe {
       background: #e8f5e9;
       color: #2e7d32;
+      border: 1px solid #a5d6a7;
     }
     .result.danger {
       background: #ffebee;
-      color: #b71c1c;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+    }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Don’t Click Fraudulent Links</h1>
+    🛡️ Anti‑Phishing Link Checker
   </header>
-  
-  <div id="root" class="container">
-    <!-- React will render here -->
+
+  <div class="container">
+    <div class="warning">
+      ⚠️ Always double-check before clicking links!
+    </div>
+
+    <div class="input-group">
+      <label for="linkInput">Enter a link you received:</label>
+      <input
+        type="text"
+        id="linkInput"
+        placeholder="https://example.com/..."
+        aria-label="URL input"
+      />
+    </div>
+
+    <button class="btn" id="checkBtn">Check Link</button>
+
+    <div id="resultBox" class="result hidden"></div>
   </div>
 
-  <!-- Load React and ReactDOM from CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  
   <script>
-    const { useState } = React;
+    (function() {
+      const checkBtn = document.getElementById('checkBtn');
+      const linkInput = document.getElementById('linkInput');
+      const resultBox = document.getElementById('resultBox');
 
-    function App() {
-      const [link, setLink] = useState("");
-      const [result, setResult] = useState(null);
+      function showResult(safe, message) {
+        resultBox.textContent = message;
+        resultBox.classList.remove('hidden', 'safe', 'danger');
+        if (safe) {
+          resultBox.classList.add('safe');
+        } else {
+          resultBox.classList.add('danger');
+        }
+      }
+
+      function validateURL(url) {
+        try {
+          new URL(url);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
 
       function checkLink() {
+        const link = linkInput.value.trim();
         if (!link) {
-          setResult({ safe: false, message: "Please enter a URL to check." });
+          showResult(false, "Please enter a URL to check.");
           return;
         }
-        // Very basic heuristics — you should replace with smarter logic or API
-        const suspiciousPatterns = ["bit.ly", "tinyurl", "free", "login", "verify", "update"];
-        const lower = link.toLowerCase();
-        for (let pat of suspiciousPatterns) {
+        // If user omitted protocol (http/https), try to add default
+        let fullLink = link;
+        if (!/^(http|https):\/\//i.test(link)) {
+          fullLink = "https://" + link;
+        }
+        if (!validateURL(fullLink)) {
+          showResult(false, "That doesn’t look like a valid URL. Please check and try again.");
+          return;
+        }
+
+        // Basic heuristics — you can enhance with an API or more rules
+        const suspiciousPatterns = [
+          "bit.ly", "tinyurl", "free", "login", "verify", "update", "signin", "account", "secure"
+        ];
+        const lower = fullLink.toLowerCase();
+
+        for (const pat of suspiciousPatterns) {
           if (lower.includes(pat)) {
-            setResult({
-              safe: false,
-              message: This link looks suspicious (contains “${pat}”). Be cautious!
-            });
+            showResult(false, `⚠️ This link looks suspicious (contains “${pat}”). Be cautious!`);
             return;
           }
         }
-        // if none matched
-        setResult({ safe: true, message: "This link appears comparatively safer." });
+
+        showResult(true, "✅ This link appears comparatively safer (no obvious risky patterns detected).");
       }
 
-      return (
-        <div>
-          <div className="warning">
-            ⚠️ Always double-check before clicking links!
-          </div>
-          <div className="input-group">
-            <label htmlFor="linkInput">Enter a link you received:</label>
-            <input
-              type="text"
-              id="linkInput"
-              placeholder="https://example.com/..."
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
-            />
-          </div>
-          <button className="btn" onClick={checkLink}>Check Link</button>
-          {result && (
-            <div className={result ${result.safe ? "safe" : "danger"}}>
-              {result.message}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+      checkBtn.addEventListener('click', checkLink);
+      linkInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          checkLink();
+        }
+      });
+    })();
   </script>
 </body>
 </html>
