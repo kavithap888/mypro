@@ -4,14 +4,12 @@
   <meta charset="UTF-8">
   <title>Teleconsultation Dashboard Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <!-- React + ReactDOM + React Router (UMD) -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script crossorigin src="https://unpkg.com/@remix-run/router@1.16.0/dist/router.umd.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-router@6.23.1/dist/umd/react-router.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-router-dom@6.23.1/dist/umd/react-router-dom.development.js"></script>
-
   <style>
     html, body, #root {
       margin: 0;
@@ -45,7 +43,8 @@
       color: inherit;
       text-decoration: none;
     }
-    .sidebar nav a:hover, .sidebar nav a.active {
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
       background-color: #34495e;
     }
     .main-content {
@@ -83,7 +82,8 @@
       display: block;
       margin-top: 0.75rem;
     }
-    .booking-form input, .booking-form select {
+    .booking-form input,
+    .booking-form select {
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.25rem;
@@ -128,6 +128,55 @@
       margin-top: 1rem;
       color: green;
     }
+
+    /* Consultation section */
+    .consult-section {
+      background: white;
+      padding: 1rem;
+      max-width: 600px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .consult-section button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .consult-section button:hover {
+      background-color: #d35400;
+    }
+
+    /* Settings */
+    .settings-form {
+      background: white;
+      padding: 1rem;
+      max-width: 500px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .settings-form label {
+      display: block;
+      margin-top: 0.75rem;
+    }
+    .settings-form input,
+    .settings-form select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .settings-form button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #8e44ad;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .settings-form button:hover {
+      background-color: #732d91;
+    }
+
   </style>
 </head>
 <body>
@@ -135,14 +184,15 @@
 
   <script type="text/javascript">
     const { BrowserRouter, Routes, Route, NavLink, Navigate } = ReactRouterDOM;
-    const { useState } = React;
+    const { useState, useEffect } = React;
 
     function Sidebar() {
+      const paths = ['dashboard','booking','consultation','payments','settings'];
       return (
         React.createElement('div', { className: 'sidebar' },
           React.createElement('div', { className: 'logo' }, 'TeleDoc Dash'),
           React.createElement('nav', null,
-            ['dashboard','booking','consultation','payments','settings'].map(path =>
+            paths.map(path =>
               React.createElement(NavLink, {
                 key: path,
                 to: '/' + path,
@@ -156,14 +206,14 @@
 
     function Header() {
       return React.createElement('div', { className: 'header' },
-        React.createElement('h3', null, 'Admin Dashboard - Appointment & Teleconsultation')
+        React.createElement('h3', null, 'Admin Dashboard — Teleconsultation Platform')
       );
     }
 
     function DashboardPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Dashboard Overview'),
-        React.createElement('p', null, 'Welcome, select a section from sidebar to manage bookings, consultations and payments.')
+        React.createElement('p', null, 'Welcome! Use sidebar to manage bookings, consultations, payments, and system settings.')
       );
     }
 
@@ -176,7 +226,7 @@
 
       const handleBook = (ev) => {
         ev.preventDefault();
-        // In real app, send booking to backend
+        // TODO: call backend API to create appointment
         setBooked(true);
       };
 
@@ -184,50 +234,60 @@
         React.createElement('h2', null, 'Book Appointment'),
         React.createElement('form', { className: 'booking-form', onSubmit: handleBook },
           React.createElement('label', null, 'Patient Name:'),
-          React.createElement('input', {
-            type: 'text',
-            value: name,
-            onChange: (e) => setName(e.target.value),
-            required: true
-          }),
+          React.createElement('input', { type: 'text', value: name, onChange: (e)=>setName(e.target.value), required: true }),
           React.createElement('label', null, 'Date:'),
-          React.createElement('input', {
-            type: 'date',
-            value: date,
-            onChange: (e) => setDate(e.target.value),
-            required: true
-          }),
+          React.createElement('input', { type: 'date', value: date, onChange: (e)=>setDate(e.target.value), required: true }),
           React.createElement('label', null, 'Slot:'),
-          React.createElement('select', {
-            value: slot,
-            onChange: (e) => setSlot(e.target.value),
-            required: true
-          },
+          React.createElement('select', { value: slot, onChange: (e)=>setSlot(e.target.value), required: true },
             React.createElement('option', { value: '' }, '--Select Slot--'),
-            React.createElement('option', { value: '09:00-10:00' }, '09:00 - 10:00'),
-            React.createElement('option', { value: '10:00-11:00' }, '10:00 - 11:00'),
-            React.createElement('option', { value: '11:00-12:00' }, '11:00 - 12:00')
+            React.createElement('option', { value: '09:00-10:00' }, '09:00 — 10:00'),
+            React.createElement('option', { value: '10:00-11:00' }, '10:00 — 11:00'),
+            React.createElement('option', { value: '11:00-12:00' }, '11:00 — 12:00')
           ),
           React.createElement('label', null, 'Consultation Type:'),
-          React.createElement('select', {
-            value: consultType,
-            onChange: (e) => setConsultType(e.target.value)
-          },
+          React.createElement('select', { value: consultType, onChange: (e)=>setConsultType(e.target.value) },
             React.createElement('option', { value: 'video' }, 'Video Call'),
             React.createElement('option', { value: 'audio' }, 'Audio Call'),
             React.createElement('option', { value: 'chat' }, 'Chat Consultation')
           ),
           React.createElement('button', { type: 'submit' }, 'Book Appointment'),
-          booked && React.createElement('div', { className: 'message' }, 'Appointment booked! Pending payment')
+          booked && React.createElement('div', { className: 'message' }, 'Appointment booked! Awaiting payment.')
         )
       );
     }
 
     function ConsultationPage() {
-      // placeholder page for starting consultations
+      const [isActive, setIsActive] = useState(false);
+      const [type, setType] = useState('video');
+
+      // For demo, simulate fetching the latest appointment
+      useEffect(() => {
+        // TODO: fetch appointment data from backend
+        // e.g. setType('video' or 'audio' or 'chat') and setIsActive(true) accordingly
+        // For demo, we assume there *is* a consultation
+        setIsActive(true);
+        setType('video');
+      }, []);
+
+      const startSession = () => {
+        if (!isActive) {
+          alert('No active consultation.');
+          return;
+        }
+        alert(`Starting ${type} consultation session...`);
+        // Here you’d integrate your real video/audio/chat SDK or logic
+      };
+
       return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Consultation Session'),
-        React.createElement('p', null, 'Here you can start the session according to the booked type (video/audio/chat).')
+        React.createElement('h2', null, 'Consultation'),
+        React.createElement('div', { className: 'consult-section' },
+          isActive
+            ? React.createElement(React.Fragment, null,
+                React.createElement('p', null, `Type: ${type.toUpperCase()}`),
+                React.createElement('button', { onClick: startSession }, `Start ${type.toUpperCase()} Session`)
+              )
+            : React.createElement('p', null, 'No active consultations currently.')
+        )
       );
     }
 
@@ -238,7 +298,7 @@
 
       const handlePay = (ev) => {
         ev.preventDefault();
-        // in real app, call payment API
+        // TODO: integrate with real payment API
         setPaid(true);
       };
 
@@ -246,17 +306,12 @@
         React.createElement('h2', null, 'Payment'),
         React.createElement('form', { className: 'payment-section', onSubmit: handlePay },
           React.createElement('label', null, 'Cardholder Name:'),
-          React.createElement('input', {
-            type: 'text',
-            value: cardName,
-            onChange: (e) => setCardName(e.target.value),
-            required: true
-          }),
+          React.createElement('input', { type: 'text', value: cardName, onChange: (e)=>setCardName(e.target.value), required: true }),
           React.createElement('label', null, 'Card Number:'),
           React.createElement('input', {
             type: 'text',
             value: cardNumber,
-            onChange: (e) => setCardNumber(e.target.value),
+            onChange: (e)=>setCardNumber(e.target.value),
             required: true,
             maxLength: 16
           }),
@@ -267,9 +322,59 @@
     }
 
     function SettingsPage() {
+      const [hospitalName, setHospitalName] = useState('');
+      const [timeZone, setTimeZone] = useState('');
+      const [notificationEmail, setNotificationEmail] = useState('');
+      const [saved, setSaved] = useState(false);
+
+      useEffect(() => {
+        // TODO: fetch existing settings from backend, e.g.:
+        // fetch('/api/settings').then(res => res.json()).then(data => { setHospitalName(...); setTimeZone(...); setNotificationEmail(...); });
+        // For demo, we simulate default values:
+        setHospitalName('My Clinic');
+        setTimeZone('Asia/Kolkata');
+        setNotificationEmail('admin@clinic.com');
+      }, []);
+
+      const handleSave = (ev) => {
+        ev.preventDefault();
+        // TODO: send settings to backend
+        // e.g. POST /api/settings { hospitalName, timeZone, notificationEmail }
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      };
+
       return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Settings'),
-        React.createElement('p', null, 'Configure system / notifications / staff etc.')
+        React.createElement('h2', null, 'System Settings'),
+        React.createElement('form', { className: 'settings-form', onSubmit: handleSave },
+          React.createElement('label', null, 'Hospital / Clinic Name:'),
+          React.createElement('input', {
+            type: 'text',
+            value: hospitalName,
+            onChange: (e) => setHospitalName(e.target.value),
+            required: true
+          }),
+          React.createElement('label', null, 'Time Zone:'),
+          React.createElement('select', {
+            value: timeZone,
+            onChange: (e) => setTimeZone(e.target.value),
+            required: true
+          },
+            React.createElement('option', { value: '' }, '--Select Time Zone--'),
+            React.createElement('option', { value: 'Asia/Kolkata' }, 'India / Kolkata'),
+            React.createElement('option', { value: 'UTC' }, 'UTC'),
+            React.createElement('option', { value: 'America/New_York' }, 'New York / US Eastern')
+          ),
+          React.createElement('label', null, 'Notification Email:'),
+          React.createElement('input', {
+            type: 'email',
+            value: notificationEmail,
+            onChange: (e) => setNotificationEmail(e.target.value),
+            required: true
+          }),
+          React.createElement('button', { type: 'submit' }, 'Save Settings'),
+          saved && React.createElement('div', { className: 'message' }, 'Settings saved!')
+        )
       );
     }
 
