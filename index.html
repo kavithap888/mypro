@@ -2,20 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Transport Dashboard Demo Fixed</title>
+  <title>Teleconsultation Dashboard Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <!-- React + ReactDOM -->
+
+  <!-- React + ReactDOM + React Router (UMD) -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-
-  <!-- Required: @remix‑run/router UMD, before react-router and react-router-dom -->
   <script crossorigin src="https://unpkg.com/@remix-run/router@1.16.0/dist/router.umd.min.js"></script>
-
-  <!-- React Router core UMD -->
   <script crossorigin src="https://unpkg.com/react-router@6.23.1/dist/umd/react-router.development.js"></script>
-
-  <!-- React Router DOM UMD -->
   <script crossorigin src="https://unpkg.com/react-router-dom@6.23.1/dist/umd/react-router-dom.development.js"></script>
 
   <style>
@@ -76,46 +70,79 @@
     .page h2 {
       margin-top: 0;
     }
-    .widgets {
-      display: flex;
-      gap: 1rem;
-    }
-    .widget {
+
+    /* Booking form styles */
+    .booking-form {
       background: white;
       padding: 1rem;
-      flex: 1;
+      max-width: 500px;
+      margin-bottom: 2rem;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .map-placeholder {
-      height: 300px;
-      background: #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
+    .booking-form label {
+      display: block;
+      margin-top: 0.75rem;
+    }
+    .booking-form input, .booking-form select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .booking-form button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .booking-form button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Payment mock */
+    .payment-section {
+      background: white;
+      padding: 1rem;
+      max-width: 500px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .payment-section input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .payment-section button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .payment-section button:hover {
+      background-color: #1e8449;
+    }
+
+    .message {
+      margin-top: 1rem;
+      color: green;
     }
   </style>
 </head>
 <body>
-
   <div id="root"></div>
 
   <script type="text/javascript">
-    const {
-      BrowserRouter,
-      Routes,
-      Route,
-      NavLink,
-      Navigate
-    } = ReactRouterDOM;
+    const { BrowserRouter, Routes, Route, NavLink, Navigate } = ReactRouterDOM;
+    const { useState } = React;
 
-    // Sidebar component
     function Sidebar() {
       return (
         React.createElement('div', { className: 'sidebar' },
-          React.createElement('div', { className: 'logo' }, 'TransDash'),
+          React.createElement('div', { className: 'logo' }, 'TeleDoc Dash'),
           React.createElement('nav', null,
-            ['dashboard','bookings','vehicles','map','drivers','reports','settings'].map(path =>
+            ['dashboard','booking','consultation','payments','settings'].map(path =>
               React.createElement(NavLink, {
                 key: path,
                 to: '/' + path,
@@ -127,75 +154,122 @@
       );
     }
 
-    // Header
     function Header() {
       return React.createElement('div', { className: 'header' },
-        React.createElement('h3', null, 'Admin Dashboard')
+        React.createElement('h3', null, 'Admin Dashboard - Appointment & Teleconsultation')
       );
     }
 
-    // Pages
     function DashboardPage() {
-      return (
-        React.createElement('div', { className: 'page dashboard' },
-          React.createElement('h2', null, 'Overview'),
-          React.createElement('div', { className: 'widgets' },
-            React.createElement('div', { className: 'widget' },
-              React.createElement('h4', null, 'Total Bookings'),
-              React.createElement('p', null, '120')
-            ),
-            React.createElement('div', { className: 'widget' },
-              React.createElement('h4', null, 'Active Vehicles'),
-              React.createElement('p', null, '35')
-            ),
-            React.createElement('div', { className: 'widget' },
-              React.createElement('h4', null, 'Revenue Today'),
-              React.createElement('p', null, '₹ 45,000')
-            )
-          )
+      return React.createElement('div', { className: 'page' },
+        React.createElement('h2', null, 'Dashboard Overview'),
+        React.createElement('p', null, 'Welcome, select a section from sidebar to manage bookings, consultations and payments.')
+      );
+    }
+
+    function BookingPage() {
+      const [name, setName] = useState('');
+      const [date, setDate] = useState('');
+      const [slot, setSlot] = useState('');
+      const [consultType, setConsultType] = useState('video');
+      const [booked, setBooked] = useState(false);
+
+      const handleBook = (ev) => {
+        ev.preventDefault();
+        // In real app, send booking to backend
+        setBooked(true);
+      };
+
+      return React.createElement('div', { className: 'page' },
+        React.createElement('h2', null, 'Book Appointment'),
+        React.createElement('form', { className: 'booking-form', onSubmit: handleBook },
+          React.createElement('label', null, 'Patient Name:'),
+          React.createElement('input', {
+            type: 'text',
+            value: name,
+            onChange: (e) => setName(e.target.value),
+            required: true
+          }),
+          React.createElement('label', null, 'Date:'),
+          React.createElement('input', {
+            type: 'date',
+            value: date,
+            onChange: (e) => setDate(e.target.value),
+            required: true
+          }),
+          React.createElement('label', null, 'Slot:'),
+          React.createElement('select', {
+            value: slot,
+            onChange: (e) => setSlot(e.target.value),
+            required: true
+          },
+            React.createElement('option', { value: '' }, '--Select Slot--'),
+            React.createElement('option', { value: '09:00-10:00' }, '09:00 - 10:00'),
+            React.createElement('option', { value: '10:00-11:00' }, '10:00 - 11:00'),
+            React.createElement('option', { value: '11:00-12:00' }, '11:00 - 12:00')
+          ),
+          React.createElement('label', null, 'Consultation Type:'),
+          React.createElement('select', {
+            value: consultType,
+            onChange: (e) => setConsultType(e.target.value)
+          },
+            React.createElement('option', { value: 'video' }, 'Video Call'),
+            React.createElement('option', { value: 'audio' }, 'Audio Call'),
+            React.createElement('option', { value: 'chat' }, 'Chat Consultation')
+          ),
+          React.createElement('button', { type: 'submit' }, 'Book Appointment'),
+          booked && React.createElement('div', { className: 'message' }, 'Appointment booked! Pending payment')
         )
       );
     }
 
-    function BookingsPage() {
+    function ConsultationPage() {
+      // placeholder page for starting consultations
       return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Bookings'),
-        React.createElement('p', null, 'List bookings here …')
+        React.createElement('h2', null, 'Consultation Session'),
+        React.createElement('p', null, 'Here you can start the session according to the booked type (video/audio/chat).')
       );
     }
 
-    function VehiclesPage() {
-      return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Vehicles'),
-        React.createElement('p', null, 'List vehicles here …')
-      );
-    }
+    function PaymentsPage() {
+      const [cardName, setCardName] = useState('');
+      const [cardNumber, setCardNumber] = useState('');
+      const [paid, setPaid] = useState(false);
 
-    function MapPage() {
-      return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Map View'),
-        React.createElement('div', { className: 'map-placeholder' }, 'Map will appear here')
-      );
-    }
+      const handlePay = (ev) => {
+        ev.preventDefault();
+        // in real app, call payment API
+        setPaid(true);
+      };
 
-    function DriversPage() {
       return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Drivers'),
-        React.createElement('p', null, 'List drivers here …')
-      );
-    }
-
-    function ReportsPage() {
-      return React.createElement('div', { className: 'page' },
-        React.createElement('h2', null, 'Reports / Analytics'),
-        React.createElement('p', null, 'Charts etc here …')
+        React.createElement('h2', null, 'Payment'),
+        React.createElement('form', { className: 'payment-section', onSubmit: handlePay },
+          React.createElement('label', null, 'Cardholder Name:'),
+          React.createElement('input', {
+            type: 'text',
+            value: cardName,
+            onChange: (e) => setCardName(e.target.value),
+            required: true
+          }),
+          React.createElement('label', null, 'Card Number:'),
+          React.createElement('input', {
+            type: 'text',
+            value: cardNumber,
+            onChange: (e) => setCardNumber(e.target.value),
+            required: true,
+            maxLength: 16
+          }),
+          React.createElement('button', { type: 'submit' }, paid ? 'Paid' : 'Pay Now'),
+          paid && React.createElement('div', { className: 'message' }, 'Payment successful!')
+        )
       );
     }
 
     function SettingsPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Settings'),
-        React.createElement('p', null, 'Configure rules, users etc.')
+        React.createElement('p', null, 'Configure system / notifications / staff etc.')
       );
     }
 
@@ -209,11 +283,9 @@
               React.createElement(Routes, null,
                 React.createElement(Route, { path: "/", element: React.createElement(Navigate, { to: "/dashboard" }) }),
                 React.createElement(Route, { path: "/dashboard", element: React.createElement(DashboardPage) }),
-                React.createElement(Route, { path: "/bookings", element: React.createElement(BookingsPage) }),
-                React.createElement(Route, { path: "/vehicles", element: React.createElement(VehiclesPage) }),
-                React.createElement(Route, { path: "/map", element: React.createElement(MapPage) }),
-                React.createElement(Route, { path: "/drivers", element: React.createElement(DriversPage) }),
-                React.createElement(Route, { path: "/reports", element: React.createElement(ReportsPage) }),
+                React.createElement(Route, { path: "/booking", element: React.createElement(BookingPage) }),
+                React.createElement(Route, { path: "/consultation", element: React.createElement(ConsultationPage) }),
+                React.createElement(Route, { path: "/payments", element: React.createElement(PaymentsPage) }),
                 React.createElement(Route, { path: "/settings", element: React.createElement(SettingsPage) })
               )
             )
@@ -225,6 +297,5 @@
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(React.createElement(App));
   </script>
-
 </body>
 </html>
