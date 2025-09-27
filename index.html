@@ -132,7 +132,7 @@
         'consultation',
         'payments',
         'settings',
-        'consultancy',
+        'Records',
         'feedback'
       ];
       return (
@@ -296,7 +296,7 @@
       );
     }
 
-    /* ---------------- Consultancy ---------------- */
+    /* ---------------- Records ---------------- */
     function ConsultancyPage() {
       const [filter, setFilter] = useState('');
       const [records, setRecords] = useState([]);
@@ -377,7 +377,7 @@
                 React.createElement(Route, { path: "/consultation", element: React.createElement(ConsultationPage) }),
                 React.createElement(Route, { path: "/payments", element: React.createElement(PaymentsPage) }),
                 React.createElement(Route, { path: "/settings", element: React.createElement(SettingsPage) }),
-                React.createElement(Route, { path: "/consultancy", element: React.createElement(ConsultancyPage) }),
+                React.createElement(Route, { path: "/Records", element: React.createElement(RecordsPage) }),
                 React.createElement(Route, { path: "/feedback", element: React.createElement(FeedbackPage) })
               )
             )
