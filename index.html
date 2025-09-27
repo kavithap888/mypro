@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Transport Dashboard</title>
-  <!-- React, ReactDOM, React Router DOM via CDN -->
+  <meta charset="UTF-8">
+  <title>Transport Dashboard Demo Fixed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- React + ReactDOM -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js"></script>
+
+  <!-- Required: @remix‑run/router UMD, before react-router and react-router-dom -->
+  <script crossorigin src="https://unpkg.com/@remix-run/router@1.16.0/dist/router.umd.min.js"></script>
+
+  <!-- React Router core UMD -->
+  <script crossorigin src="https://unpkg.com/react-router@6.23.1/dist/umd/react-router.development.js"></script>
+
+  <!-- React Router DOM UMD -->
+  <script crossorigin src="https://unpkg.com/react-router-dom@6.23.1/dist/umd/react-router-dom.development.js"></script>
+
   <style>
-    html, body {
+    html, body, #root {
       margin: 0;
       padding: 0;
       height: 100%;
       font-family: Arial, sans-serif;
-    }
-    #root {
-      height: 100%;
     }
     .app-container {
       display: flex;
@@ -90,10 +97,19 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/javascript">
-    const { BrowserRouter, Routes, Route, NavLink, Navigate } = ReactRouterDOM;
 
+  <div id="root"></div>
+
+  <script type="text/javascript">
+    const {
+      BrowserRouter,
+      Routes,
+      Route,
+      NavLink,
+      Navigate
+    } = ReactRouterDOM;
+
+    // Sidebar component
     function Sidebar() {
       return (
         React.createElement('div', { className: 'sidebar' },
@@ -104,21 +120,22 @@
                 key: path,
                 to: '/' + path,
                 className: ({ isActive }) => isActive ? 'active' : ''
-              },
-              path.charAt(0).toUpperCase() + path.slice(1))
+              }, path.charAt(0).toUpperCase() + path.slice(1))
             )
           )
         )
       );
     }
 
+    // Header
     function Header() {
       return React.createElement('div', { className: 'header' },
         React.createElement('h3', null, 'Admin Dashboard')
       );
     }
 
-    function Dashboard() {
+    // Pages
+    function DashboardPage() {
       return (
         React.createElement('div', { className: 'page dashboard' },
           React.createElement('h2', null, 'Overview'),
@@ -140,37 +157,42 @@
       );
     }
 
-    function Bookings() {
+    function BookingsPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Bookings'),
         React.createElement('p', null, 'List bookings here …')
       );
     }
-    function Vehicles() {
+
+    function VehiclesPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Vehicles'),
         React.createElement('p', null, 'List vehicles here …')
       );
     }
-    function MapView() {
+
+    function MapPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Map View'),
         React.createElement('div', { className: 'map-placeholder' }, 'Map will appear here')
       );
     }
-    function Drivers() {
+
+    function DriversPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Drivers'),
         React.createElement('p', null, 'List drivers here …')
       );
     }
-    function Reports() {
+
+    function ReportsPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Reports / Analytics'),
         React.createElement('p', null, 'Charts etc here …')
       );
     }
-    function Settings() {
+
+    function SettingsPage() {
       return React.createElement('div', { className: 'page' },
         React.createElement('h2', null, 'Settings'),
         React.createElement('p', null, 'Configure rules, users etc.')
@@ -178,23 +200,21 @@
     }
 
     function App() {
-      return (
-        React.createElement(BrowserRouter, null,
-          React.createElement('div', { className: 'app-container' },
-            React.createElement(Sidebar),
-            React.createElement('div', { className: 'main-content' },
-              React.createElement(Header),
-              React.createElement('div', { className: 'content-area' },
-                React.createElement(Routes, null,
-                  React.createElement(Route, { path: "/", element: React.createElement(Navigate, { to: "/dashboard" }) }),
-                  React.createElement(Route, { path: "/dashboard", element: React.createElement(Dashboard) }),
-                  React.createElement(Route, { path: "/bookings", element: React.createElement(Bookings) }),
-                  React.createElement(Route, { path: "/vehicles", element: React.createElement(Vehicles) }),
-                  React.createElement(Route, { path: "/map", element: React.createElement(MapView) }),
-                  React.createElement(Route, { path: "/drivers", element: React.createElement(Drivers) }),
-                  React.createElement(Route, { path: "/reports", element: React.createElement(Reports) }),
-                  React.createElement(Route, { path: "/settings", element: React.createElement(Settings) })
-                )
+      return React.createElement(BrowserRouter, null,
+        React.createElement('div', { className: 'app-container' },
+          React.createElement(Sidebar),
+          React.createElement('div', { className: 'main-content' },
+            React.createElement(Header),
+            React.createElement('div', { className: 'content-area' },
+              React.createElement(Routes, null,
+                React.createElement(Route, { path: "/", element: React.createElement(Navigate, { to: "/dashboard" }) }),
+                React.createElement(Route, { path: "/dashboard", element: React.createElement(DashboardPage) }),
+                React.createElement(Route, { path: "/bookings", element: React.createElement(BookingsPage) }),
+                React.createElement(Route, { path: "/vehicles", element: React.createElement(VehiclesPage) }),
+                React.createElement(Route, { path: "/map", element: React.createElement(MapPage) }),
+                React.createElement(Route, { path: "/drivers", element: React.createElement(DriversPage) }),
+                React.createElement(Route, { path: "/reports", element: React.createElement(ReportsPage) }),
+                React.createElement(Route, { path: "/settings", element: React.createElement(SettingsPage) })
               )
             )
           )
@@ -202,7 +222,9 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
   </script>
+
 </body>
 </html>
